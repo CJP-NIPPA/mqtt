@@ -7,3 +7,10 @@ Routine for the raspberry to asynchronously read and write the packages at ports
 ## Sensor
 Routine for the sensors to asynchronously measure and send the packages at Listener port.
 
+## Objectives
+Understand:
+1. Standard layered network scheme.
+2. Private policies of networks.
+3. Private IPs, Gateway, Broadcast, Internal ports.
+4. daemon routines.
+5. Firewall, port listening, forwarding, output, etc.
