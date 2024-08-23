@@ -1,0 +1,14 @@
+[Unit]
+Description=Air pollution project
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 ~/Desktop/{project_name}/sensor_listener.py
+WorkingDirectory=~/Desktop/{project_name}
+User=your-username
+Group=your-group
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
