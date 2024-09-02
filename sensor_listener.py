@@ -4,13 +4,50 @@ import aiofiles
 import csv
 import logging
 
+from random import randint
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import datetime as dt
+from lora_reciever import Receiver
+
 class Listener:
     def __init__(self, host: str, port: int, csv_path: str) -> None:
-        self.host = host
-        self.port = port
-        self.path = csv_path
+        self.host = host # vos
+        self.port = port # una puerta por la que van a entrar los datos
+        self.path = csv_path # el csv donde guardar
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+        self.x: List[float|int] = []
+        self.y: List[float|int] = []
+        fig, ax = plt.subplots()
+        self.fig = fig
+        self.ax = ax
+        FuncAnimation(self.fig, self.animate, interval=100, repeat=False, fargs=(self.x,self.y, 3))
+        plt.show()
+
+
+    def animate(self,i,x,y, index):
+        ## Sacar un dato
+        try:
+            async with aiofiles.open('output_1.csv', 'r') as file:
+                lines = await file.readlines()
+                data = lines[-20:]
+
+                variable = data[index]
+
+                self.x.append(dt.datetime.now().strftime('%H:%M:%S'))
+                self.y.append(variable)
+
+                self.x = self.x[-20:]
+                self.y = self.y[-20:]
+                self.ax.clear()
+                self.ax.plot(x,y)
+                self.ax.set_title(f'{names[index]} over time')
+                self.ax.set_ylim(boundary[index])
+
+                plt.xticks(rotation=45)
+        except Exception as e:
+            self.logger.error(f"Error starting server: {e}")
 
     async def start_listening(self):
         try:
@@ -33,6 +70,7 @@ class Listener:
                     break
                 message = data.decode('utf-8').strip()
                 await self.write_to_csv(message)
+
         except Exception as e:
             self.logger.error(f"Error handling connection: {e}")
         finally:
